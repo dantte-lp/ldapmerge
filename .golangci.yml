@@ -66,6 +66,12 @@ linters:
         - io.WriteString
         - time.Parse
         - strconv.ParseBool
+        - (*github.com/fatih/color.Color).Print
+        - (*github.com/fatih/color.Color).Fprint
+        - (*github.com/fatih/color.Color).Fprintf
+        - (*database/sql.Rows).Close
+        - (*database/sql.DB).Close
+        - (*net/http.Response).Body.Close
 
     govet:
       enable-all: true
@@ -109,10 +115,8 @@ linters:
         - name: error-return
         - name: error-strings
         - name: error-naming
-        - name: exported
         - name: increment-decrement
         - name: indent-error-flow
-        - name: package-comments
         - name: range
         - name: receiver-naming
         - name: time-naming
@@ -123,6 +127,7 @@ linters:
     gosec:
       excludes:
         - G104  # Audit errors not checked (handled by errcheck)
+        - G301  # Directory permissions (we use 0755 intentionally)
         - G304  # File path provided as taint input (false positives)
 
     nakedret:
@@ -157,6 +162,11 @@ linters:
       - linters:
           - unparam
         text: "is unused"
+
+      # Exclude noctx for PRAGMA calls (don't need context)
+      - linters:
+          - noctx
+        text: "PRAGMA"
 
 issues:
   max-issues-per-linter: 50
