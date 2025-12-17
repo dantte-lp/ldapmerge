@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2025-12-17
+
 ### Added
 
 - **Health Endpoint**: Database information in `/api/health` response
@@ -23,6 +25,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **API Documentation**: Replaced Stoplight Elements with Scalar for API docs at `/docs`
 - **OpenAPI Schema**: Enhanced with detailed descriptions, examples, and tags
 - **Models**: Added field documentation and examples for better OpenAPI generation
+- **Dependencies**: Updated Go to 1.25.5 and all dependencies to latest versions
+  - go.opentelemetry.io/otel v1.37.0 → v1.39.0
+  - golang.org/x/sync v0.16.0 → v0.19.0
+  - golang.org/x/sys v0.36.0 → v0.39.0
+  - golang.org/x/text v0.28.0 → v0.32.0
+  - modernc.org/libc v1.66.10 → v1.67.1
+
+### Fixed
+
+- Linter issues from golangci-lint (errcheck, gosec, staticcheck)
+- HTTP server timeouts for security (gosec G114)
+- File permissions hardened to 0600 (gosec G306)
 
 ## [1.0.0] - 2025-12-17
 
@@ -99,5 +113,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-[Unreleased]: https://github.com/dantte-lp/ldapmerge/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/dantte-lp/ldapmerge/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/dantte-lp/ldapmerge/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/dantte-lp/ldapmerge/releases/tag/v1.0.0
