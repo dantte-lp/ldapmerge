@@ -1,0 +1,78 @@
+# Binaries
+/build/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+/ldapmerge
+!/cmd/ldapmerge/
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+coverage.html
+
+# Go workspace file
+go.work
+go.work.sum
+
+# Dependency directories
+vendor/
+
+# IDE and editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Log files
+*.log
+logs/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Config files with secrets
+.ldapmerge.yaml
+.ldapmerge.yml
+config.yaml
+config.yml
+!.ldapmerge.example.yaml
+
+# Temporary files
+tmp/
+temp/
+.tmp/
+
+# Test data with secrets
+testdata/secrets/
+*.pem
+*.key
+*.crt
+!testdata/*.pem
+!testdata/*.crt
+
+# Release artifacts
+dist/
+*.tar.gz
+*.zip
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Profiling
+*.prof
+*.pprof
+
+# Air live reload
+.air.toml
+air.toml
