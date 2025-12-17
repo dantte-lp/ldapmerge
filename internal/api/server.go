@@ -36,11 +36,24 @@ type MergeOutput struct {
 	Body []models.Domain
 }
 
+// DatabaseInfo contains database information for health check
+type DatabaseInfo struct {
+	Path         string `json:"path" doc:"Database file path" example:"/home/user/.ldapmerge/data.db"`
+	Size         int64  `json:"size" doc:"Database size in bytes" example:"45056"`
+	SizeHuman    string `json:"size_human" doc:"Human-readable database size" example:"44.0 KB"`
+	Version      string `json:"version" doc:"SQLite version" example:"3.46.0"`
+	Tables       int    `json:"tables" doc:"Number of application tables" example:"2"`
+	WALMode      bool   `json:"wal_mode" doc:"Write-Ahead Logging enabled" example:"true"`
+	HistoryCount int64  `json:"history_count" doc:"Number of history entries" example:"10"`
+	ConfigCount  int64  `json:"config_count" doc:"Number of saved NSX configs" example:"2"`
+}
+
 // HealthOutput is the response for health check
 type HealthOutput struct {
 	Body struct {
-		Status  string `json:"status" example:"ok" doc:"Health status"`
-		Version string `json:"version" example:"1.0.0" doc:"API version"`
+		Status   string        `json:"status" example:"ok" doc:"Health status"`
+		Version  string        `json:"version" example:"1.0.0" doc:"API version"`
+		Database *DatabaseInfo `json:"database,omitempty" doc:"Database information"`
 	}
 }
 
@@ -220,12 +233,23 @@ The merge result is automatically saved to the history database for auditing pur
 		Method:      http.MethodGet,
 		Path:        "/api/health",
 		Summary:     "Health check",
-		Description: `Returns the health status of the API server.
+		Description: `Returns the health status of the API server and database information.
 
-Use this endpoint for:
+## Response includes:
+
+- **status**: Server health status
+- **version**: API version
+- **database**: SQLite database information
+  - path, size, SQLite version
+  - WAL mode status
+  - record counts (history, configs)
+
+## Use cases:
+
 - Kubernetes liveness/readiness probes
 - Load balancer health checks
-- Monitoring systems`,
+- Monitoring and alerting systems
+- Database diagnostics`,
 		Tags: []string{"system"},
 	}, s.handleHealth)
 
@@ -341,6 +365,23 @@ func (s *Server) handleHealth(ctx context.Context, input *struct{}) (*HealthOutp
 	output := &HealthOutput{}
 	output.Body.Status = "ok"
 	output.Body.Version = version.Short()
+
+	// Add database info if available
+	if s.repo != nil {
+		if dbInfo, err := s.repo.GetDBInfo(ctx); err == nil {
+			output.Body.Database = &DatabaseInfo{
+				Path:         dbInfo.Path,
+				Size:         dbInfo.Size,
+				SizeHuman:    dbInfo.SizeHuman,
+				Version:      dbInfo.Version,
+				Tables:       dbInfo.Tables,
+				WALMode:      dbInfo.WALMode,
+				HistoryCount: dbInfo.HistoryCount,
+				ConfigCount:  dbInfo.ConfigCount,
+			}
+		}
+	}
+
 	return output, nil
 }
 

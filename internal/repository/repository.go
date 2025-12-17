@@ -6,6 +6,7 @@ import (
 	"embed"
 	"encoding/json"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/pressly/goose/v3"
@@ -19,7 +20,8 @@ var migrationsFS embed.FS
 
 // Repository handles database operations
 type Repository struct {
-	db *sql.DB
+	db     *sql.DB
+	dbPath string
 }
 
 // New creates a new repository with the given database path
@@ -41,7 +43,7 @@ func New(dbPath string) (*Repository, error) {
 		return nil, fmt.Errorf("failed to enable foreign keys: %w", err)
 	}
 
-	repo := &Repository{db: db}
+	repo := &Repository{db: db, dbPath: dbPath}
 
 	if err := repo.migrate(); err != nil {
 		db.Close()
@@ -65,6 +67,78 @@ func (r *Repository) migrate() error {
 // Close closes the database connection
 func (r *Repository) Close() error {
 	return r.db.Close()
+}
+
+// DBInfo contains database information
+type DBInfo struct {
+	Path         string `json:"path"`
+	Size         int64  `json:"size"`
+	SizeHuman    string `json:"size_human"`
+	Version      string `json:"version"`
+	Tables       int    `json:"tables"`
+	WALMode      bool   `json:"wal_mode"`
+	HistoryCount int64  `json:"history_count"`
+	ConfigCount  int64  `json:"config_count"`
+}
+
+// GetDBInfo returns database information
+func (r *Repository) GetDBInfo(ctx context.Context) (*DBInfo, error) {
+	info := &DBInfo{
+		Path: r.dbPath,
+	}
+
+	// Get SQLite version
+	row := r.db.QueryRowContext(ctx, "SELECT sqlite_version()")
+	if err := row.Scan(&info.Version); err != nil {
+		info.Version = "unknown"
+	}
+
+	// Get journal mode (WAL or not)
+	var journalMode string
+	row = r.db.QueryRowContext(ctx, "PRAGMA journal_mode")
+	if err := row.Scan(&journalMode); err == nil {
+		info.WALMode = journalMode == "wal"
+	}
+
+	// Get table count
+	row = r.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE 'goose_%'")
+	if err := row.Scan(&info.Tables); err != nil {
+		info.Tables = 0
+	}
+
+	// Get history count
+	row = r.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM history")
+	if err := row.Scan(&info.HistoryCount); err != nil {
+		info.HistoryCount = 0
+	}
+
+	// Get config count
+	row = r.db.QueryRowContext(ctx, "SELECT COUNT(*) FROM nsx_configs")
+	if err := row.Scan(&info.ConfigCount); err != nil {
+		info.ConfigCount = 0
+	}
+
+	// Get file size
+	if fileInfo, err := os.Stat(r.dbPath); err == nil {
+		info.Size = fileInfo.Size()
+		info.SizeHuman = formatBytes(info.Size)
+	}
+
+	return info, nil
+}
+
+// formatBytes converts bytes to human readable string
+func formatBytes(b int64) string {
+	const unit = 1024
+	if b < unit {
+		return fmt.Sprintf("%d B", b)
+	}
+	div, exp := int64(unit), 0
+	for n := b / unit; n >= unit; n /= unit {
+		div *= unit
+		exp++
+	}
+	return fmt.Sprintf("%.1f %cB", float64(b)/float64(div), "KMGTPE"[exp])
 }
 
 // SaveHistory saves a merge operation to history
