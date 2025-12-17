@@ -27,7 +27,6 @@ var (
 	titleStyle   = color.New(color.FgHiCyan, color.Bold)
 	headerStyle  = color.New(color.FgHiYellow, color.Bold)
 	cmdStyle     = color.New(color.FgHiGreen)
-	flagStyle    = color.New(color.FgHiMagenta)
 	descStyle    = color.New(color.FgWhite)
 	iconStyle    = color.New(color.FgHiBlue)
 	versionStyle = color.New(color.FgHiWhite, color.Faint)
@@ -168,9 +167,9 @@ func init() {
 	rootCmd.PersistentFlags().BoolVar(&logConsole, "log-console", false, "also output logs to console")
 
 	// Bind to viper
-	viper.BindPFlag("logging.dir", rootCmd.PersistentFlags().Lookup("log-dir"))
-	viper.BindPFlag("logging.level", rootCmd.PersistentFlags().Lookup("log-level"))
-	viper.BindPFlag("logging.console", rootCmd.PersistentFlags().Lookup("log-console"))
+	_ = viper.BindPFlag("logging.dir", rootCmd.PersistentFlags().Lookup("log-dir"))
+	_ = viper.BindPFlag("logging.level", rootCmd.PersistentFlags().Lookup("log-level"))
+	_ = viper.BindPFlag("logging.console", rootCmd.PersistentFlags().Lookup("log-console"))
 
 	// Customize help template
 	rootCmd.SetUsageTemplate(getUsageTemplate())
@@ -216,7 +215,7 @@ func initConfig() {
 	_ = viper.ReadInConfig()
 }
 
-func initLogging(cmd *cobra.Command, args []string) error {
+func initLogging(cmd *cobra.Command, _ []string) error {
 	// Determine log directory
 	dir := viper.GetString("logging.dir")
 	if dir == "" {

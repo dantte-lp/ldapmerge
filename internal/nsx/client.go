@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-// Client is an NSX API client
+// Client is an NSX API client.
 type Client struct {
 	baseURL    string
 	username   string
@@ -20,7 +20,7 @@ type Client struct {
 	httpClient *http.Client
 }
 
-// ClientConfig holds configuration for NSX client
+// ClientConfig holds configuration for NSX client.
 type ClientConfig struct {
 	Host     string
 	Username string
@@ -29,8 +29,8 @@ type ClientConfig struct {
 	Timeout  time.Duration
 }
 
-// LDAPIdentitySource represents NSX LDAP identity source
-// Based on NSX 4.2 API: /policy/api/v1/aaa/ldap-identity-sources/{ldap-identity-source-id}
+// LDAPIdentitySource represents NSX LDAP identity source.
+// Based on NSX 4.2 API: /policy/api/v1/aaa/ldap-identity-sources/{ldap-identity-source-id}.
 type LDAPIdentitySource struct {
 	ID                     string       `json:"id,omitempty"`
 	DisplayName            string       `json:"display_name,omitempty"`
@@ -45,7 +45,7 @@ type LDAPIdentitySource struct {
 	RelativePath           string       `json:"relative_path,omitempty"`
 }
 
-// LDAPServer represents an LDAP server in NSX
+// LDAPServer represents an LDAP server in NSX.
 type LDAPServer struct {
 	URL          string   `json:"url"`
 	UseStartTLS  bool     `json:"use_starttls,omitempty"`
@@ -55,37 +55,37 @@ type LDAPServer struct {
 	Certificates []string `json:"certificates,omitempty"`
 }
 
-// LDAPIdentitySourceListResult represents list response
+// LDAPIdentitySourceListResult represents list response.
 type LDAPIdentitySourceListResult struct {
 	Results     []LDAPIdentitySource `json:"results"`
 	ResultCount int                  `json:"result_count"`
 	Cursor      string               `json:"cursor,omitempty"`
 }
 
-// ProbeResult represents the result of a probe operation
+// ProbeResult represents the result of a probe operation.
 type ProbeResult struct {
 	Results []ProbeResultItem `json:"results"`
 }
 
-// ProbeResultItem represents a single probe result
+// ProbeResultItem represents a single probe result.
 type ProbeResultItem struct {
 	LDAPServerURL string `json:"ldap_server_url"`
 	Success       bool   `json:"success"`
 	ErrorMessage  string `json:"error_message,omitempty"`
 }
 
-// FetchCertificateRequest represents request to fetch certificate
+// FetchCertificateRequest represents request to fetch certificate.
 type FetchCertificateRequest struct {
 	LDAPServerURL string `json:"ldap_server_url"`
 }
 
-// FetchCertificateResult represents certificate fetch response
+// FetchCertificateResult represents certificate fetch response.
 type FetchCertificateResult struct {
 	PEMEncoded string              `json:"pem_encoded"`
 	Details    []CertificateDetail `json:"details,omitempty"`
 }
 
-// CertificateDetail contains certificate subject info
+// CertificateDetail contains certificate subject info.
 type CertificateDetail struct {
 	SubjectCN          string `json:"subject_cn,omitempty"`
 	SubjectDN          string `json:"subject_dn,omitempty"`
@@ -129,11 +129,11 @@ func (e *APIError) Error() string {
 	return fmt.Sprintf("NSX API error %d: %s (code: %d)", e.HTTPStatus, e.ErrorMessage, e.ErrorCode)
 }
 
-// NewClient creates a new NSX API client
+// NewClient creates a new NSX API client.
 func NewClient(cfg ClientConfig) *Client {
 	transport := &http.Transport{
 		TLSClientConfig: &tls.Config{
-			InsecureSkipVerify: cfg.Insecure,
+			InsecureSkipVerify: cfg.Insecure, //nolint:gosec // G402: Intentionally configurable for self-signed certs
 		},
 	}
 
@@ -153,7 +153,9 @@ func NewClient(cfg ClientConfig) *Client {
 	}
 }
 
-// doRequest performs an HTTP request to NSX API
+// doRequest performs an HTTP request to NSX API.
+//
+//nolint:unparam // statusCode return value used for future error handling
 func (c *Client) doRequest(ctx context.Context, method, path string, body interface{}) ([]byte, int, error) {
 	reqURL := fmt.Sprintf("%s%s", c.baseURL, path)
 

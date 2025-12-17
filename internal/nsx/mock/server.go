@@ -41,7 +41,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if !ok || user != s.Username || pass != s.Password {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusUnauthorized)
-		json.NewEncoder(w).Encode(map[string]interface{}{
+		_ = json.NewEncoder(w).Encode(map[string]interface{}{
 			"error_code":    401,
 			"error_message": "Authentication required",
 		})
@@ -172,7 +172,7 @@ func (s *Server) handleLDAPIdentitySource(w http.ResponseWriter, r *http.Request
 	}
 }
 
-func (s *Server) listSources(w http.ResponseWriter, r *http.Request) {
+func (s *Server) listSources(w http.ResponseWriter, _ *http.Request) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
@@ -186,31 +186,31 @@ func (s *Server) listSources(w http.ResponseWriter, r *http.Request) {
 		ResultCount: len(results),
 	}
 
-	json.NewEncoder(w).Encode(response)
+	_ = json.NewEncoder(w).Encode(response)
 }
 
-func (s *Server) getSource(w http.ResponseWriter, r *http.Request, id string) {
+func (s *Server) getSource(w http.ResponseWriter, _ *http.Request, id string) {
 	s.mu.RLock()
 	source, ok := s.sources[id]
 	s.mu.RUnlock()
 
 	if !ok {
 		w.WriteHeader(http.StatusNotFound)
-		json.NewEncoder(w).Encode(map[string]interface{}{
+		_ = json.NewEncoder(w).Encode(map[string]interface{}{
 			"error_code":    404,
 			"error_message": fmt.Sprintf("LDAP identity source '%s' not found", id),
 		})
 		return
 	}
 
-	json.NewEncoder(w).Encode(source)
+	_ = json.NewEncoder(w).Encode(source)
 }
 
 func (s *Server) putSource(w http.ResponseWriter, r *http.Request, id string) {
 	var source nsx.LDAPIdentitySource
 	if err := json.NewDecoder(r.Body).Decode(&source); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]interface{}{
+		_ = json.NewEncoder(w).Encode(map[string]interface{}{
 			"error_code":    400,
 			"error_message": "Invalid JSON body",
 		})
@@ -226,7 +226,7 @@ func (s *Server) putSource(w http.ResponseWriter, r *http.Request, id string) {
 	s.sources[id] = &source
 	s.mu.Unlock()
 
-	json.NewEncoder(w).Encode(source)
+	_ = json.NewEncoder(w).Encode(source)
 }
 
 func (s *Server) patchSource(w http.ResponseWriter, r *http.Request, id string) {
@@ -241,7 +241,7 @@ func (s *Server) patchSource(w http.ResponseWriter, r *http.Request, id string) 
 	var patch nsx.LDAPIdentitySource
 	if err := json.NewDecoder(r.Body).Decode(&patch); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]interface{}{
+		_ = json.NewEncoder(w).Encode(map[string]interface{}{
 			"error_code":    400,
 			"error_message": "Invalid JSON body",
 		})
@@ -269,16 +269,16 @@ func (s *Server) patchSource(w http.ResponseWriter, r *http.Request, id string) 
 	}
 
 	s.sources[id] = existing
-	json.NewEncoder(w).Encode(existing)
+	_ = json.NewEncoder(w).Encode(existing)
 }
 
-func (s *Server) deleteSource(w http.ResponseWriter, r *http.Request, id string) {
+func (s *Server) deleteSource(w http.ResponseWriter, _ *http.Request, id string) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	if _, ok := s.sources[id]; !ok {
 		w.WriteHeader(http.StatusNotFound)
-		json.NewEncoder(w).Encode(map[string]interface{}{
+		_ = json.NewEncoder(w).Encode(map[string]interface{}{
 			"error_code":    404,
 			"error_message": fmt.Sprintf("LDAP identity source '%s' not found", id),
 		})
@@ -304,7 +304,7 @@ func (s *Server) probeLDAPServer(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	json.NewEncoder(w).Encode(nsx.ProbeResult{Results: results})
+	_ = json.NewEncoder(w).Encode(nsx.ProbeResult{Results: results})
 }
 
 func (s *Server) probeIdentitySource(w http.ResponseWriter, r *http.Request) {
@@ -322,17 +322,17 @@ func (s *Server) probeIdentitySource(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	json.NewEncoder(w).Encode(nsx.ProbeResult{Results: results})
+	_ = json.NewEncoder(w).Encode(nsx.ProbeResult{Results: results})
 }
 
-func (s *Server) probeConfiguredSource(w http.ResponseWriter, r *http.Request, id string) {
+func (s *Server) probeConfiguredSource(w http.ResponseWriter, _ *http.Request, id string) {
 	s.mu.RLock()
 	source, ok := s.sources[id]
 	s.mu.RUnlock()
 
 	if !ok {
 		w.WriteHeader(http.StatusNotFound)
-		json.NewEncoder(w).Encode(map[string]interface{}{
+		_ = json.NewEncoder(w).Encode(map[string]interface{}{
 			"error_code":    404,
 			"error_message": fmt.Sprintf("LDAP identity source '%s' not found", id),
 		})
@@ -347,7 +347,7 @@ func (s *Server) probeConfiguredSource(w http.ResponseWriter, r *http.Request, i
 		}
 	}
 
-	json.NewEncoder(w).Encode(nsx.ProbeResult{Results: results})
+	_ = json.NewEncoder(w).Encode(nsx.ProbeResult{Results: results})
 }
 
 func (s *Server) fetchCertificate(w http.ResponseWriter, r *http.Request) {
@@ -372,7 +372,7 @@ func (s *Server) fetchCertificate(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	json.NewEncoder(w).Encode(result)
+	_ = json.NewEncoder(w).Encode(result)
 }
 
 func (s *Server) searchSource(w http.ResponseWriter, r *http.Request, id string) {
@@ -382,7 +382,7 @@ func (s *Server) searchSource(w http.ResponseWriter, r *http.Request, id string)
 
 	if !ok {
 		w.WriteHeader(http.StatusNotFound)
-		json.NewEncoder(w).Encode(map[string]interface{}{
+		_ = json.NewEncoder(w).Encode(map[string]interface{}{
 			"error_code":    404,
 			"error_message": fmt.Sprintf("LDAP identity source '%s' not found", id),
 		})
@@ -415,7 +415,7 @@ func (s *Server) searchSource(w http.ResponseWriter, r *http.Request, id string)
 		ResultCount: 2,
 	}
 
-	json.NewEncoder(w).Encode(result)
+	_ = json.NewEncoder(w).Encode(result)
 }
 
 func extractHostFromURL(urlStr string) string {

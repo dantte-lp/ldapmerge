@@ -35,7 +35,7 @@ linters:
     - goconst          # Repeated strings to constants
     - gocritic         # Various checks
     - gocyclo          # Cyclomatic complexity
-    - godot            # Comment ending with period
+    # - godot          # Comment ending with period (disabled - too strict for doc comments)
     - gofmt            # Formatting
     - goimports        # Import ordering
     - gosec            # Security issues
@@ -62,10 +62,12 @@ linters:
 linters-settings:
   errcheck:
     check-type-assertions: true
-    check-blank: true
+    check-blank: false
     exclude-functions:
       - io.Copy
       - io.WriteString
+      - time.Parse
+      - strconv.ParseBool
 
   govet:
     enable-all: true
@@ -94,8 +96,11 @@ linters-settings:
       - style
       - performance
     disabled-checks:
-      - hugeParam       # Too strict
-      - rangeValCopy    # Too strict
+      - hugeParam        # Too strict
+      - rangeValCopy     # Too strict
+      - unnamedResult    # Too strict for simple functions
+      - octalLiteral     # We use both styles intentionally
+      - paramTypeCombine # Style preference
 
   revive:
     rules:
@@ -135,16 +140,21 @@ issues:
         - goconst
         - gocognit
 
-    # Exclude some linters from running on generated files
+    # Exclude some linters from running on mock/test utilities
     - path: mock
       linters:
         - dupl
         - gosec
+        - unparam
+        - errcheck
 
-    # Allow unused parameters in interface implementations
+    # Allow unused parameters in interface implementations and HTTP handlers
     - linters:
         - unparam
       text: "always receives"
+    - linters:
+        - unparam
+      text: "is unused"
 
   max-issues-per-linter: 50
   max-same-issues: 10

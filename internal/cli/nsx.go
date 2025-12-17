@@ -121,13 +121,13 @@ func init() {
 	nsxCmd.PersistentFlags().BoolVarP(&nsxInsecure, "insecure", "k", false, "Skip TLS certificate verification")
 	nsxCmd.PersistentFlags().IntVar(&nsxTimeout, "timeout", 30, "API request timeout in seconds")
 
-	nsxCmd.MarkPersistentFlagRequired("host")
-	nsxCmd.MarkPersistentFlagRequired("username")
-	nsxCmd.MarkPersistentFlagRequired("password")
+	_ = nsxCmd.MarkPersistentFlagRequired("host")
+	_ = nsxCmd.MarkPersistentFlagRequired("username")
+	_ = nsxCmd.MarkPersistentFlagRequired("password")
 
 	// Push-specific flags
 	nsxPushCmd.Flags().StringVarP(&initialFile, "file", "f", "", "path to merged JSON file (required)")
-	nsxPushCmd.MarkFlagRequired("file")
+	_ = nsxPushCmd.MarkFlagRequired("file")
 }
 
 func getNSXClient() *nsx.Client {

@@ -46,9 +46,9 @@ func init() {
 	serverCmd.Flags().IntVarP(&serverPort, "port", "p", 8080, "server port")
 	serverCmd.Flags().StringVar(&dbPath, "db", "", "path to SQLite database (default: $HOME/.ldapmerge/data.db)")
 
-	viper.BindPFlag("server.host", serverCmd.Flags().Lookup("host"))
-	viper.BindPFlag("server.port", serverCmd.Flags().Lookup("port"))
-	viper.BindPFlag("server.db", serverCmd.Flags().Lookup("db"))
+	_ = viper.BindPFlag("server.host", serverCmd.Flags().Lookup("host"))
+	_ = viper.BindPFlag("server.port", serverCmd.Flags().Lookup("port"))
+	_ = viper.BindPFlag("server.db", serverCmd.Flags().Lookup("db"))
 }
 
 func getDBPath() string {
@@ -66,7 +66,7 @@ func getDBPath() string {
 	}
 
 	dataDir := filepath.Join(home, ".ldapmerge")
-	if err := os.MkdirAll(dataDir, 0755); err != nil {
+	if err := os.MkdirAll(dataDir, 0o755); err != nil {
 		return "ldapmerge.db"
 	}
 

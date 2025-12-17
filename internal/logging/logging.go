@@ -9,7 +9,7 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
-// Config holds logging configuration
+// Config holds logging configuration.
 type Config struct {
 	// File settings
 	LogDir     string // Directory for log files (default: executable directory)
@@ -25,7 +25,7 @@ type Config struct {
 	Console    bool       // Also output to console (default: false)
 }
 
-// DefaultConfig returns default logging configuration
+// DefaultConfig returns default logging configuration.
 func DefaultConfig() Config {
 	return Config{
 		LogDir:     "",
@@ -40,19 +40,19 @@ func DefaultConfig() Config {
 	}
 }
 
-// Logger wraps slog.Logger with additional functionality
+// Logger wraps slog.Logger with additional functionality.
 type Logger struct {
 	*slog.Logger
 	lj *lumberjack.Logger
 }
 
-// New creates a new logger with the given configuration
+// New creates a new logger with the given configuration.
 func New(cfg Config) (*Logger, error) {
 	logPath := getLogPath(cfg)
 
 	// Ensure log directory exists
 	logDir := filepath.Dir(logPath)
-	if err := os.MkdirAll(logDir, 0755); err != nil {
+	if err := os.MkdirAll(logDir, 0o755); err != nil {
 		return nil, err
 	}
 
@@ -91,7 +91,7 @@ func New(cfg Config) (*Logger, error) {
 	}, nil
 }
 
-// Close closes the underlying log file
+// Close closes the underlying log file.
 func (l *Logger) Close() error {
 	if l.lj != nil {
 		return l.lj.Close()
@@ -99,7 +99,7 @@ func (l *Logger) Close() error {
 	return nil
 }
 
-// Rotate forces log rotation
+// Rotate forces log rotation.
 func (l *Logger) Rotate() error {
 	if l.lj != nil {
 		return l.lj.Rotate()

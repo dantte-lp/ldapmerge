@@ -38,8 +38,8 @@ func init() {
 	mergeCmd.Flags().StringVarP(&outputFile, "output", "o", "", "path to output file (default: stdout)")
 	mergeCmd.Flags().BoolVarP(&compact, "compact", "c", false, "output compact JSON (no indentation)")
 
-	mergeCmd.MarkFlagRequired("initial")
-	mergeCmd.MarkFlagRequired("response")
+	_ = mergeCmd.MarkFlagRequired("initial")
+	_ = mergeCmd.MarkFlagRequired("response")
 }
 
 func runMerge(cmd *cobra.Command, args []string) error {
@@ -73,7 +73,7 @@ func runMerge(cmd *cobra.Command, args []string) error {
 	}
 
 	if outputFile != "" {
-		if err := os.WriteFile(outputFile, jsonData, 0644); err != nil {
+		if err := os.WriteFile(outputFile, jsonData, 0o600); err != nil {
 			log.Error("failed to write output file", "error", err, "file", outputFile)
 			return fmt.Errorf("failed to write output file: %w", err)
 		}

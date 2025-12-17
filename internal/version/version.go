@@ -5,7 +5,7 @@ import (
 	"runtime"
 )
 
-// Build information - set via ldflags
+// Build information - set via ldflags.
 var (
 	Version   = "dev"
 	Commit    = "unknown"
@@ -13,12 +13,12 @@ var (
 	GoVersion = runtime.Version()
 )
 
-// Info returns formatted version information
+// Info returns formatted version information.
 func Info() string {
 	return fmt.Sprintf("ldapmerge %s", Version)
 }
 
-// Full returns full version information
+// Full returns full version information.
 func Full() string {
 	return fmt.Sprintf(`ldapmerge %s
   Commit:     %s
@@ -28,7 +28,7 @@ func Full() string {
 		Version, Commit, BuildDate, GoVersion, runtime.GOOS, runtime.GOARCH)
 }
 
-// Short returns short version string
+// Short returns short version string.
 func Short() string {
 	return Version
 }

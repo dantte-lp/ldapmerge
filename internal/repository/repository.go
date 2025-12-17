@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/pressly/goose/v3"
-	_ "modernc.org/sqlite"
+	_ "modernc.org/sqlite" // SQLite driver for database/sql
 
 	"ldapmerge/internal/models"
 )
@@ -18,13 +18,13 @@ import (
 //go:embed migrations/*.sql
 var migrationsFS embed.FS
 
-// Repository handles database operations
+// Repository handles database operations.
 type Repository struct {
 	db     *sql.DB
 	dbPath string
 }
 
-// New creates a new repository with the given database path
+// New creates a new repository with the given database path.
 func New(dbPath string) (*Repository, error) {
 	db, err := sql.Open("sqlite", dbPath)
 	if err != nil {
@@ -53,7 +53,7 @@ func New(dbPath string) (*Repository, error) {
 	return repo, nil
 }
 
-// migrate runs database migrations
+// migrate runs database migrations.
 func (r *Repository) migrate() error {
 	goose.SetBaseFS(migrationsFS)
 
@@ -64,12 +64,12 @@ func (r *Repository) migrate() error {
 	return goose.Up(r.db, "migrations")
 }
 
-// Close closes the database connection
+// Close closes the database connection.
 func (r *Repository) Close() error {
 	return r.db.Close()
 }
 
-// DBInfo contains database information
+// DBInfo contains database information.
 type DBInfo struct {
 	Path         string `json:"path"`
 	Size         int64  `json:"size"`

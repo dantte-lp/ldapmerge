@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"net/http"
+	"time"
 
 	"github.com/danielgtaylor/huma/v2"
 	"github.com/danielgtaylor/huma/v2/adapters/humabunrouter"
@@ -349,13 +350,9 @@ This action cannot be undone.`,
 func (s *Server) handleMerge(ctx context.Context, input *MergeInput) (*MergeOutput, error) {
 	result := s.merger.Merge(input.Body.Initial, &input.Body.Response)
 
-	// Save to history
+	// Save to history (ignore error, don't fail the request)
 	if s.repo != nil {
-		_, err := s.repo.SaveHistory(ctx, input.Body.Initial, input.Body.Response, result)
-		if err != nil {
-			// Log error but don't fail the request
-			// TODO: add proper logging
-		}
+		_, _ = s.repo.SaveHistory(ctx, input.Body.Initial, input.Body.Response, result)
 	}
 
 	return &MergeOutput{Body: result}, nil
@@ -460,12 +457,20 @@ func (s *Server) handleDeleteConfig(ctx context.Context, input *ConfigPathInput)
 		return nil, huma.Error404NotFound("config not found")
 	}
 
-	return nil, nil
+	return &struct{}{}, nil
 }
 
 // Start starts the HTTP server
 func (s *Server) Start() error {
-	return http.ListenAndServe(s.addr, s.router)
+	srv := &http.Server{
+		Addr:              s.addr,
+		Handler:           s.router,
+		ReadTimeout:       30 * time.Second,
+		ReadHeaderTimeout: 10 * time.Second,
+		WriteTimeout:      30 * time.Second,
+		IdleTimeout:       120 * time.Second,
+	}
+	return srv.ListenAndServe()
 }
 
 // Scalar API Documentation HTML

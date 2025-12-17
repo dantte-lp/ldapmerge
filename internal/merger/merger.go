@@ -8,15 +8,15 @@ import (
 	"ldapmerge/internal/models"
 )
 
-// Merger handles the merging of initial and response data
+// Merger handles the merging of initial and response data.
 type Merger struct{}
 
-// New creates a new Merger instance
+// New creates a new Merger instance.
 func New() *Merger {
 	return &Merger{}
 }
 
-// LoadInitialFromFile loads the initial domains from a JSON file
+// LoadInitialFromFile loads the initial domains from a JSON file.
 func (m *Merger) LoadInitialFromFile(path string) ([]models.Domain, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
@@ -31,7 +31,7 @@ func (m *Merger) LoadInitialFromFile(path string) ([]models.Domain, error) {
 	return domains, nil
 }
 
-// LoadResponseFromFile loads the certificate response from a JSON file
+// LoadResponseFromFile loads the certificate response from a JSON file.
 func (m *Merger) LoadResponseFromFile(path string) (*models.CertificateResponse, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
@@ -46,7 +46,7 @@ func (m *Merger) LoadResponseFromFile(path string) (*models.CertificateResponse,
 	return &response, nil
 }
 
-// buildCertificateMap creates a map from URL to certificates
+// buildCertificateMap creates a map from URL to certificates.
 func (m *Merger) buildCertificateMap(response *models.CertificateResponse) map[string][]string {
 	certMap := make(map[string][]string)
 
@@ -68,7 +68,7 @@ func (m *Merger) buildCertificateMap(response *models.CertificateResponse) map[s
 	return certMap
 }
 
-// Merge combines the initial domains with certificates from the response
+// Merge combines the initial domains with certificates from the response.
 func (m *Merger) Merge(domains []models.Domain, response *models.CertificateResponse) []models.Domain {
 	certMap := m.buildCertificateMap(response)
 
@@ -101,7 +101,7 @@ func (m *Merger) Merge(domains []models.Domain, response *models.CertificateResp
 	return result
 }
 
-// MergeFromFiles loads files and performs the merge operation
+// MergeFromFiles loads files and performs the merge operation.
 func (m *Merger) MergeFromFiles(initialPath, responsePath string) ([]models.Domain, error) {
 	domains, err := m.LoadInitialFromFile(initialPath)
 	if err != nil {
@@ -116,7 +116,7 @@ func (m *Merger) MergeFromFiles(initialPath, responsePath string) ([]models.Doma
 	return m.Merge(domains, response), nil
 }
 
-// ToJSON converts the result to formatted JSON
+// ToJSON converts the result to formatted JSON.
 func (m *Merger) ToJSON(domains []models.Domain, indent bool) ([]byte, error) {
 	if indent {
 		return json.MarshalIndent(domains, "", "    ")

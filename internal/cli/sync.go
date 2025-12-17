@@ -70,10 +70,10 @@ func init() {
 	syncCmd.Flags().StringVarP(&syncOutputFile, "output", "o", "", "Save merged result to file (optional)")
 	syncCmd.Flags().BoolVar(&syncDryRun, "dry-run", false, "Perform pull and merge, but skip push to NSX")
 
-	syncCmd.MarkFlagRequired("host")
-	syncCmd.MarkFlagRequired("username")
-	syncCmd.MarkFlagRequired("password")
-	syncCmd.MarkFlagRequired("response")
+	_ = syncCmd.MarkFlagRequired("host")
+	_ = syncCmd.MarkFlagRequired("username")
+	_ = syncCmd.MarkFlagRequired("password")
+	_ = syncCmd.MarkFlagRequired("response")
 }
 
 func runSync(cmd *cobra.Command, args []string) error {
@@ -215,5 +215,5 @@ func saveResultToFile(domains []models.Domain, path string) error {
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(path, data, 0644)
+	return os.WriteFile(path, data, 0o600)
 }
