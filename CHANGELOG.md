@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **API Documentation**: Replaced Stoplight Elements with Scalar for API docs at `/docs`
+- **OpenAPI Schema**: Enhanced with detailed descriptions, examples, and tags
+- **Models**: Added field documentation and examples for better OpenAPI generation
+
 ## [1.0.0] - 2025-12-17
 
 ### Added
