@@ -28,8 +28,9 @@ YELLOW := \033[0;33m
 CYAN := \033[0;36m
 NC := \033[0m
 
-.PHONY: all build clean test lint deps help version
+.PHONY: all build clean test lint lint-fix deps help version
 .PHONY: build-linux build-windows build-darwin build-all
+.PHONY: security trivy pre-commit
 
 # Default target
 all: build
@@ -92,11 +93,51 @@ test:
 lint:
 	@echo "$(YELLOW)► Running linter...$(NC)"
 	@if command -v golangci-lint >/dev/null 2>&1; then \
-		golangci-lint run ./...; \
+		golangci-lint run --config=.golangci.yml ./...; \
 	else \
 		echo "golangci-lint not installed, skipping"; \
 	fi
 	@echo "$(GREEN)✓ Lint complete$(NC)"
+
+# Run linter with auto-fix
+lint-fix:
+	@echo "$(YELLOW)► Running linter with auto-fix...$(NC)"
+	@if command -v golangci-lint >/dev/null 2>&1; then \
+		golangci-lint run --config=.golangci.yml --fix ./...; \
+	else \
+		echo "golangci-lint not installed, skipping"; \
+	fi
+	@echo "$(GREEN)✓ Lint fix complete$(NC)"
+
+# Run Trivy security scanner
+trivy:
+	@echo "$(YELLOW)► Running Trivy security scan...$(NC)"
+	@if command -v trivy >/dev/null 2>&1; then \
+		trivy fs --severity HIGH,CRITICAL .; \
+	else \
+		echo "trivy not installed, skipping"; \
+	fi
+	@echo "$(GREEN)✓ Trivy scan complete$(NC)"
+
+# Run all security checks
+security: lint trivy
+	@echo "$(YELLOW)► Running GoSec...$(NC)"
+	@if command -v gosec >/dev/null 2>&1; then \
+		gosec -quiet ./...; \
+	else \
+		echo "gosec not installed, skipping"; \
+	fi
+	@echo "$(GREEN)✓ Security checks complete$(NC)"
+
+# Run pre-commit hooks
+pre-commit:
+	@echo "$(YELLOW)► Running pre-commit hooks...$(NC)"
+	@if command -v pre-commit >/dev/null 2>&1; then \
+		pre-commit run --all-files; \
+	else \
+		echo "pre-commit not installed. Install with: pip install pre-commit"; \
+	fi
+	@echo "$(GREEN)✓ Pre-commit complete$(NC)"
 
 # Clean build artifacts
 clean:
@@ -141,6 +182,10 @@ help:
 	@echo "  $(GREEN)build-darwin$(NC)   Build for macOS ARM64"
 	@echo "  $(GREEN)test$(NC)           Run tests"
 	@echo "  $(GREEN)lint$(NC)           Run linter"
+	@echo "  $(GREEN)lint-fix$(NC)       Run linter with auto-fix"
+	@echo "  $(GREEN)security$(NC)       Run all security checks (lint, trivy, gosec)"
+	@echo "  $(GREEN)trivy$(NC)          Run Trivy vulnerability scanner"
+	@echo "  $(GREEN)pre-commit$(NC)     Run pre-commit hooks"
 	@echo "  $(GREEN)clean$(NC)          Clean build artifacts"
 	@echo "  $(GREEN)deps$(NC)           Install dependencies"
 	@echo "  $(GREEN)run$(NC)            Build and run"

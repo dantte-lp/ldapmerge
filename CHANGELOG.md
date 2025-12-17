@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Health Endpoint**: Database information in `/api/health` response
+  - SQLite version, file path, size
+  - WAL mode status, table count
+  - Record counts for history and configs
+- **Code Quality**: Pre-commit hooks with linters and security scanning
+  - golangci-lint for Go code analysis
+  - Trivy for vulnerability scanning
+  - gofmt, govet, staticcheck checks
+
 ### Changed
 
 - **API Documentation**: Replaced Stoplight Elements with Scalar for API docs at `/docs`
