@@ -17,7 +17,6 @@ output:
       print-issued-lines: true
       print-linter-name: true
       colors: true
-  sort-results: true
 
 formatters:
   enable:
