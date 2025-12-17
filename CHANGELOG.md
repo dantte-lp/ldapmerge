@@ -25,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **API Documentation**: Replaced Stoplight Elements with Scalar for API docs at `/docs`
 - **OpenAPI Schema**: Enhanced with detailed descriptions, examples, and tags
 - **Models**: Added field documentation and examples for better OpenAPI generation
-- **Dependencies**: Updated Go to 1.24.0 and all dependencies to latest versions
+- **Dependencies**: Updated Go to 1.25.5 and all dependencies to latest versions
   - go.opentelemetry.io/otel v1.37.0 → v1.39.0
   - golang.org/x/sync v0.16.0 → v0.19.0
   - golang.org/x/sys v0.36.0 → v0.39.0
