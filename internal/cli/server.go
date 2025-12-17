@@ -83,7 +83,7 @@ func runServer(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return fmt.Errorf("failed to initialize database: %w", err)
 	}
-	defer repo.Close()
+	defer func() { _ = repo.Close() }()
 
 	srv := api.NewServer(addr, repo)
 

@@ -54,7 +54,7 @@ var rootCmd = &cobra.Command{
 		return initLogging(cmd, args)
 	},
 	PersistentPostRun: func(cmd *cobra.Command, args []string) {
-		logging.Close()
+		_ = logging.Close()
 	},
 }
 
